@@ -1,7 +1,15 @@
-from flask import Flask
-from .config import Config
+# app/__init__.py
 
-app = Flask(__name__)
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate  import Migrate
+from .config      import Config
+
+app    = Flask(__name__)
 app.config.from_object(Config)
 
-from app import views
+# register extensions on the global `app`
+db     = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+from . import views
