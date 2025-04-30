@@ -4,9 +4,6 @@
     <router-link to="/">Go Home</router-link>
   </div>
 </template>
-
 <script>
-export default {
-  name: 'NotFound'
-}
+export default { name: 'NotFound' }
 </script>
