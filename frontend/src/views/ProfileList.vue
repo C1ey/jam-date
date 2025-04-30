@@ -1,3 +1,5 @@
+# from frontend/src/views
+cat > ProfileList.vue << 'EOF'
 <template>
   <div style="max-width:800px; margin:auto; padding:1em;">
     <h2>Profiles</h2>
@@ -53,10 +55,7 @@ export default {
     async loadRecent() {
       try {
         const res = await axios.get('/profiles')
-        // sort by id descending and take the latest 4
-        this.profiles = res.data
-          .sort((a, b) => b.id - a.id)
-          .slice(0, 4)
+        this.profiles = res.data.sort((a, b) => b.id - a.id).slice(0, 4)
       } catch (e) {
         console.error('Error loading recent profiles', e)
       }
@@ -77,3 +76,4 @@ export default {
   }
 }
 </script>
+EOF

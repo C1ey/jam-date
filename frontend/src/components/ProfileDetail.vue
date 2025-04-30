@@ -1,23 +1,40 @@
-<!-- src/components/ProfileDetail.vue -->
-<script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import api from '../api';
-
-const route   = useRoute();
-const profile = ref(null);
-
-onMounted(async () => {
-  const { data } = await api.get(`/profiles/${route.params.id}`);
-  profile.value = data;
-});
-</script>
-
 <template>
-  <div v-if="profile">
-    <h2>{{ profile.username }}’s Profile</h2>
-    <p>{{ profile.description }}</p>
-    <p><strong>Parish:</strong> {{ profile.parish }}</p>
-    <!-- etc… -->
+  <div v-if="profile" class="profile-detail">
+    <h2>{{ profile.user.name }} (@{{ profile.user.username }})</h2>
+    <img v-if="profile.user.photo" :src="profile.user.photo" alt="Profile photo" class="photo"/>
+    <p><strong>Email:</strong> {{ profile.user.email }}</p>
+    <p><strong>Description:</strong> {{ profile.description }}</p>
+    <!-- ...rest of your fields -->
   </div>
 </template>
+
+<script>
+import axios from 'axios'
+export default {
+  name: 'ProfileDetail',
+  data() {
+    return {
+      profile: null,
+      matches: [],
+      currentYear: new Date().getFullYear()
+    }
+  },
+  async created() {
+    try {
+      const res = await axios.get(`/profiles/${this.$route.params.id}`)
+      this.profile = res.data
+    } catch (e) {
+      console.error(e)
+    }
+  },
+  // ...methods unchanged
+}
+</script>
+
+<style>
+.profile-detail .photo {
+  max-width: 150px;
+  border-radius: 50%;
+  margin-bottom: 1em;
+}
+</style>

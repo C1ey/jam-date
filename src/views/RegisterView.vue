@@ -1,69 +1,98 @@
 <template>
-  <div class="auth-page">
-    <h2>Register</h2>
-    <form @submit.prevent="onRegister">
-      <div>
-        <label for="username">Username</label><br>
-        <input
-          id="username"
-          v-model="username"
-          type="text"
-          placeholder="Choose a username"
-          required
-        />
+  <div class="register-page">
+    <h1>Register</h1>
+    <form @submit.prevent="onSubmit">
+      <div class="form-group">
+        <label>Username</label>
+        <input v-model="form.username" type="text" required />
       </div>
-      <div style="margin-top:0.5em;">
-        <label for="password">Password</label><br>
-        <input
-          id="password"
-          v-model="password"
-          type="password"
-          placeholder="Choose a password"
-          required
-        />
-      </div>
-      <button type="submit" style="margin-top:1em;">Sign Up</button>
-    </form>
 
-    <p v-if="error" class="error">{{ error }}</p>
-    <p style="margin-top:1em;">
-      Already have an account? 
-      <router-link to="/login">Log in here</router-link>.
-    </p>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input v-model="form.name" type="text" required />
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input v-model="form.email" type="email" required />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input v-model="form.password" type="password" required />
+      </div>
+
+      <div class="form-group">
+        <label>Photo URL (optional)</label>
+        <input v-model="form.photo" type="url" />
+      </div>
+
+      <button type="submit">Sign Up</button>
+
+      <p v-if="error" class="error">{{ error }}</p>
+      <p>
+        Already have an account?
+        <router-link to="/login">Log in here.</router-link>
+      </p>
+    </form>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   name: 'RegisterView',
   data() {
     return {
-      username: '',
-      password: '',
+      form: {
+        username: '',
+        name:     '',
+        email:    '',
+        password: '',
+        photo:    ''
+      },
       error: ''
-    }
+    };
   },
   methods: {
-    async onRegister() {
-      this.error = ''
+    async onSubmit() {
+      this.error = '';
       try {
-        await axios.post('/auth/register', {
-          username: this.username,
-          password: this.password
-        })
-        // after successful register, send them to login
-        this.$router.push({ name: 'login' })
+        // axios is already wired to VITE_API_URL
+        await axios.post('/auth/register', this.form);
+        this.$router.push('/login');
       } catch (e) {
-        this.error = e.response?.data?.msg || 'Registration failed'
+        console.error(e.response?.data);
+        this.error = e.response?.data?.msg || 'Registration failed';
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
-.auth-page { max-width: 400px; margin: 2em auto; }
-.error { color: red; margin-top: 1em; }
+.register-page {
+  max-width: 400px;
+  margin: 2rem auto;
+}
+.form-group {
+  margin-bottom: 1rem;
+}
+label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+input {
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+button {
+  padding: 0.6rem 1.2rem;
+}
+.error {
+  color: #e74c3c;
+  margin-top: 0.8rem;
+}
 </style>

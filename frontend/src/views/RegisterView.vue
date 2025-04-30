@@ -1,27 +1,42 @@
 <template>
-  <div style="max-width: 400px; margin: auto; padding: 1em;">
-    <h2>Register</h2>
-    <form @submit.prevent="doRegister">
-      <div class="field">
+  <div class="register-page">
+    <h1>Register</h1>
+    <form @submit.prevent="onSubmit">
+      <div class="form-group">
         <label for="username">Username</label>
-        <input id="username" v-model="username" required />
+        <input id="username" v-model="username" type="text" placeholder="Kevin" required />
       </div>
-      <div class="field">
+
+      <div class="form-group">
         <label for="password">Password</label>
-        <input id="password" type="password" v-model="password" required />
+        <input id="password" v-model="password" type="password" placeholder="••••••" required />
       </div>
+
+      <!-- NEW -->
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input id="name" v-model="name" type="text" placeholder="Kevin Smith" required />
+      </div>
+
+      <!-- NEW -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" v-model="email" type="email" placeholder="you@example.com" required />
+      </div>
+
       <button type="submit">Sign Up</button>
+
+      <p v-if="error" class="error">{{ error }}</p>
+      <p>
+        Already have an account?
+        <router-link to="/login">Log in here.</router-link>
+      </p>
     </form>
-    <p v-if="error" class="error">{{ error }}</p>
-    <p>
-      Already have an account?
-      <router-link to="/login">Log in here</router-link>.
-    </p>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   name: 'RegisterView',
@@ -29,29 +44,42 @@ export default {
     return {
       username: '',
       password: '',
+      name: '',
+      email: '',
       error: ''
-    }
+    };
   },
   methods: {
-    async doRegister() {
-      this.error = ''
+    async onSubmit() {
+      this.error = '';
+      console.log('📤 Register payload:', {
+        username: this.username,
+        password: this.password,
+        name:     this.name,
+        email:    this.email
+      });
       try {
         await axios.post('/auth/register', {
           username: this.username,
-          password: this.password
-        })
-        // On success, redirect to login
-        this.$router.push('/login')
-      } catch (e) {
-        // Show server‐sent message or fallback
-        this.error = e.response?.data?.msg || 'Registration failed'
+          password: this.password,
+          name:     this.name,
+          email:    this.email
+        });
+        this.$router.push('/login');
+      } catch (err) {
+        console.error('❌ register error:', err.response?.data);
+        this.error = err.response?.data?.msg || 'Registration failed';
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
-.field { margin-bottom: 0.75em; }
-.error { color: red; }
+.register-page { max-width:400px; margin:2rem auto; }
+.form-group { margin-bottom:1rem; }
+label { display:block; margin-bottom:.3rem; }
+input { width:100%; padding:.5rem; box-sizing:border-box; }
+button { padding:.6rem 1.2rem; margin-top:1rem; }
+.error { color:#e74c3c; margin-top:.8rem; }
 </style>
