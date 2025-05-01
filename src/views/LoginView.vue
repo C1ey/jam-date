@@ -1,40 +1,24 @@
 <template>
-  <div class="auth-page">
-    <h2>Log In</h2>
-    <form @submit.prevent="onLogin">
-      <div>
-        <label for="username">Username</label><br>
-        <input
-          id="username"
-          v-model="username"
-          type="text"
-          placeholder="Your username"
-          required
-        />
+  <div class="login-page">
+    <h1>Login</h1>
+    <form @submit.prevent="onSubmit">
+      <div class="form-group">
+        <label>Username</label>
+        <input v-model="username" required />
       </div>
-      <div style="margin-top:0.5em;">
-        <label for="password">Password</label><br>
-        <input
-          id="password"
-          v-model="password"
-          type="password"
-          placeholder="Your password"
-          required
-        />
+      <div class="form-group">
+        <label>Password</label>
+        <input v-model="password" type="password" required />
       </div>
-      <button type="submit" style="margin-top:1em;">Log In</button>
+      <button type="submit">Log In</button>
+      <p v-if="error" class="error">{{ error }}</p>
     </form>
-
-    <p v-if="error" class="error">{{ error }}</p>
-    <p style="margin-top:1em;">
-      Don’t have an account? 
-      <router-link to="/register">Register here</router-link>.
-    </p>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'LoginView',
@@ -45,20 +29,24 @@ export default {
       error: ''
     }
   },
+  setup() {
+    const router = useRouter()
+    return { router }
+  },
   methods: {
-    async onLogin() {
+    async onSubmit() {
       this.error = ''
       try {
         const res = await axios.post('/auth/login', {
           username: this.username,
           password: this.password
         })
-        // save JWT
+        // save your token
         localStorage.setItem('jwt', res.data.access_token)
-        // go to profiles list
-        this.$router.push({ name: 'profiles' })
-      } catch (e) {
-        this.error = e.response?.data?.msg || 'Login failed'
+        // force a full reload so App.vue re-reads it
+        window.location.href = '/'
+      } catch (err) {
+        this.error = err.response?.data?.msg || 'Login failed'
       }
     }
   }
@@ -66,6 +54,7 @@ export default {
 </script>
 
 <style scoped>
-.auth-page { max-width: 400px; margin: 2em auto; }
-.error { color: red; margin-top: 1em; }
+.login-page { max-width:400px; margin:2rem auto; }
+.form-group { margin-bottom:1rem; }
+.error { color: #e74c3c; }
 </style>
